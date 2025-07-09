@@ -1,14 +1,8 @@
-###############################################################################
-# docker-compose.yml  —  OpenHands UI with Daytona runtime (single service)
-###############################################################################
 version: "3.9"
 
 services:
   openhands:
-    build:
-      context: ./
-      dockerfile: ./containers/app/Dockerfile
-    image: openhands:latest
+    image: ghcr.io/z360biz-llc/openhands:latest
     container_name: openhands-app
     restart: unless-stopped
     environment:
