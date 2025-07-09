@@ -1,0 +1,20 @@
+services:
+  openhands:
+    image: ghcr.io/z360biz-llc/openhands:latest        # 🚚 pulled from GHCR
+    container_name: openhands-app
+    restart: unless-stopped
+    labels:
+      - "com.centurylinklabs.watchtower.enable=true"   # watch only this one
+    environment:
+      - NODE_OPTIONS=--openssl-legacy-provider
+      - WORKSPACE_MOUNT_PATH=/opt/workspace_base
+    ports:
+      - "3000:3000"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ~/.openhands:/.openhands
+      - ./workspace:/opt/workspace_base
+      - openhands_data:/data             # <- if you store DB/files here
+
+volumes:
+  openhands_data:
