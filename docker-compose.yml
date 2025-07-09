@@ -14,7 +14,7 @@ services:
       # Tell OpenHands to use Daytona instead of the local Docker runtime
       - OPENHANDS_RUNTIME_PROVIDER=daytona
       # Your personal / org Daytona API key (exported on the host or in .env)
-      - DAYTONA_API_KEY=${DAYTONA_API_KEY}
+      - DAYTONA_API_KEY=dtn_4a09e967aa21e26fc669c582bcb3c3de0a17329cfc8fef878f0d999263082c3d
       # Optional: where the agent will mount a working directory in Daytona
       - WORKSPACE_MOUNT_PATH=/opt/workspace_base
 
