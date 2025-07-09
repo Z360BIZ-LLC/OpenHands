@@ -12,9 +12,10 @@ services:
       - "3000:3000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.openhands:/.openhands
+      - openhands_config:/.openhands
       - ./workspace:/opt/workspace_base
       - openhands_data:/data             # <- if you store DB/files here
 
 volumes:
   openhands_data:
+  openhands_config:

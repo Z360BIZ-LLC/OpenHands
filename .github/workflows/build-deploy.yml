@@ -1,0 +1,32 @@
+name: Build & Push (GHCR)
+on:
+  push:
+    branches: [ main ]
+
+permissions:               # let Actions push to GHCR
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Log in to GHCR
+      uses: docker/login-action@v3
+      with:
+        registry: ghcr.io
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Build & push image
+      uses: docker/build-push-action@v5
+      with:
+        context: .
+        push: true
+        tags: |
+          ghcr.io/z360biz-llc/openhands:latest
+          ghcr.io/z360biz-llc/openhands:${{ github.sha }}
+        cache-from: type=registry,ref=ghcr.io/z360biz-llc/openhands:cache
+        cache-to:   type=registry,ref=ghcr.io/z360biz-llc/openhands:cache,mode=max
