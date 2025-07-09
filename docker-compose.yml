@@ -24,7 +24,7 @@ services:
       - openhands
 
   openhands-runtime:
-    image: docker.all-hands.dev/all-hands-ai/runtime:0.48-nikolaik
+    image: docker.all-hands.dev/all-hands-ai/runtime:0.47-nikolaik
     container_name: openhands-runtime
     restart: unless-stopped
     ports:
