@@ -1,44 +1,29 @@
 ###############################################################################
-# docker-compose.yml  —  single-service, cloud-ready
+# docker-compose.yml  —  OpenHands UI with Daytona runtime (single service)
 ###############################################################################
 version: "3.9"
 
 services:
   openhands:
-    # ▸ Option A (CI built image)  ────────────────────────────────────────────
-    # Comment out the `build:` block below and keep the `image:` line when
-    # you’re deploying the pre-built image from GHCR in the cloud.
-    image: ghcr.io/z360biz-llc/openhands:latest   # ← pulled by VM/CI runner
-
-    # ▸ Option B (local dev build)  ───────────────────────────────────────────
-    # Uncomment this section when working locally so Compose can build:
-    # build:
-    #   context: ./
-    #   dockerfile: ./containers/app/Dockerfile
-    # image: openhands:latest                      # tag after local build
-    # ------------------------------------------------------------------------
-
+    # Use your pre-built app image from GHCR
+    image: ghcr.io/z360biz-llc/openhands:latest
     container_name: openhands-app
     restart: unless-stopped
 
     environment:
-      - NODE_OPTIONS=--openssl-legacy-provider
-      # Tell the UI which image to launch for each sandbox task
-      - SANDBOX_RUNTIME_CONTAINER_IMAGE=ghcr.io/all-hands-ai/runtime:0.48-nikolaik
-      # Where that sandbox mounts your workspace
+      # Tell OpenHands to use Daytona instead of the local Docker runtime
+      - OPENHANDS_RUNTIME_PROVIDER=daytona
+      # Your personal / org Daytona API key (exported on the host or in .env)
+      - DAYTONA_API_KEY=${DAYTONA_API_KEY}
+      # Optional: where the agent will mount a working directory in Daytona
       - WORKSPACE_MOUNT_PATH=/opt/workspace_base
+
     ports:
       - "3000:3000"
-    volumes:
-      # Needed so the UI can ‘docker run’ the sandbox containers
-      - /var/run/docker.sock:/var/run/docker.sock
-      # Agent metadata / cache
-      - ~/.openhands:/.openhands
-      # Your project files that the agent will edit
-      - ./workspace:/opt/workspace_base
 
-    stdin_open: true
-    tty: true
+    volumes:
+      # Agent cache & config; **no /var/run/docker.sock needed**
+      - ~/.openhands:/.openhands
 
 networks:
   default:
