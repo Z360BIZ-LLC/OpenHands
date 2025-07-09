@@ -27,6 +27,7 @@ jobs:
       uses: docker/build-push-action@v5
       with:
         context: .
+        file: containers/app/Dockerfile
         push: true
         tags: |
           ghcr.io/z360biz-llc/openhands:latest
