@@ -1,10 +1,10 @@
+version: "3.9"
+
 services:
   openhands:
-    image: ghcr.io/z360biz-llc/openhands:latest        # 🚚 pulled from GHCR
+    image: ghcr.io/z360biz-llc/openhands:latest   # pulled from GitHub Container Registry
     container_name: openhands-app
     restart: unless-stopped
-    labels:
-      - "com.centurylinklabs.watchtower.enable=true"   # watch only this one
     environment:
       - NODE_OPTIONS=--openssl-legacy-provider
       - WORKSPACE_MOUNT_PATH=/opt/workspace_base
@@ -12,10 +12,25 @@ services:
       - "3000:3000"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - openhands_config:/.openhands
+      - ~/.openhands:/.openhands
       - ./workspace:/opt/workspace_base
-      - openhands_data:/data             # <- if you store DB/files here
+    depends_on:
+      - openhands-runtime
+    networks:
+      - openhands
 
-volumes:
-  openhands_data:
-  openhands_config:
+  openhands-runtime:
+    image: docker.all-hands.dev/all-hands-ai/runtime:0.48-nikolaik
+    container_name: openhands-runtime
+    restart: unless-stopped
+    ports:
+      - "30917:30917"
+      - "47017:47017"
+      - "53309:53309"
+      - "58691:58691"
+    networks:
+      - openhands
+
+networks:
+  openhands:
+    driver: bridge
