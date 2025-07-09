@@ -25,6 +25,7 @@ services:
 
   openhands-runtime:
     image: docker.all-hands.dev/all-hands-ai/runtime:0.47-nikolaik
+    command: ["python3", "-m", "openhands.runtime", "--listen", "0.0.0.0:30917"]
     container_name: openhands-runtime
     restart: unless-stopped
     ports:
