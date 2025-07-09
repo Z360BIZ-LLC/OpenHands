@@ -4,20 +4,35 @@ services:
       context: ./
       dockerfile: ./containers/app/Dockerfile
     image: openhands:latest
-    container_name: openhands-app-${DATE:-}
+    container_name: openhands-app
+    restart: unless-stopped
     environment:
       - NODE_OPTIONS=--openssl-legacy-provider
-      - SANDBOX_RUNTIME_CONTAINER_IMAGE=${SANDBOX_RUNTIME_CONTAINER_IMAGE:-docker.all-hands.dev/all-hands-ai/runtime:0.48-nikolaik}
-      #- SANDBOX_USER_ID=${SANDBOX_USER_ID:-1234} # enable this only if you want a specific non-root sandbox user but you will have to manually adjust permissions of ~/.openhands for this user
+      - SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.48-nikolaik
       - WORKSPACE_MOUNT_PATH=${WORKSPACE_BASE:-$PWD/workspace}
     ports:
       - "3000:3000"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.openhands:/.openhands
       - ./workspace:/opt/workspace_base
-    pull_policy: build
-    stdin_open: true
-    tty: true
+    depends_on:
+      - openhands-runtime
+    networks:
+      - openhands
+
+  openhands-runtime:
+    image: docker.all-hands.dev/all-hands-ai/runtime:0.48-nikolaik
+    container_name: openhands-runtime
+    restart: unless-stopped
+    ports:
+      - "30917:30917"
+      - "47017:47017"
+      - "53309:53309"
+      - "58691:58691"
+    networks:
+      - openhands
+
+networks:
+  openhands:
+    driver: bridge
