@@ -1,41 +1,45 @@
+###############################################################################
+# docker-compose.yml  —  single-service, cloud-ready
+###############################################################################
 version: "3.9"
 
 services:
   openhands:
-    build:
-      context: ./
-      dockerfile: ./containers/app/Dockerfile
-    image: openhands:latest
+    # ▸ Option A (CI built image)  ────────────────────────────────────────────
+    # Comment out the `build:` block below and keep the `image:` line when
+    # you’re deploying the pre-built image from GHCR in the cloud.
+    image: ghcr.io/z360biz-llc/openhands:latest   # ← pulled by VM/CI runner
+
+    # ▸ Option B (local dev build)  ───────────────────────────────────────────
+    # Uncomment this section when working locally so Compose can build:
+    # build:
+    #   context: ./
+    #   dockerfile: ./containers/app/Dockerfile
+    # image: openhands:latest                      # tag after local build
+    # ------------------------------------------------------------------------
+
     container_name: openhands-app
     restart: unless-stopped
+
     environment:
       - NODE_OPTIONS=--openssl-legacy-provider
-      - SANDBOX_RUNTIME_CONTAINER_IMAGE=docker.all-hands.dev/all-hands-ai/runtime:0.48-nikolaik
-      - WORKSPACE_MOUNT_PATH=${WORKSPACE_BASE:-/opt/workspace_base} # Safer default for container
+      # Tell the UI which image to launch for each sandbox task
+      - SANDBOX_RUNTIME_CONTAINER_IMAGE=ghcr.io/all-hands-ai/runtime:0.48-nikolaik
+      # Where that sandbox mounts your workspace
+      - WORKSPACE_MOUNT_PATH=/opt/workspace_base
     ports:
       - "3000:3000"
     volumes:
+      # Needed so the UI can ‘docker run’ the sandbox containers
       - /var/run/docker.sock:/var/run/docker.sock
+      # Agent metadata / cache
       - ~/.openhands:/.openhands
+      # Your project files that the agent will edit
       - ./workspace:/opt/workspace_base
-    depends_on:
-      - openhands-runtime
-    networks:
-      - openhands
 
-  openhands-runtime:
-    image: docker.all-hands.dev/all-hands-ai/runtime:0.47-nikolaik
-    command: ["python3", "-m", "openhands.runtime", "--listen", "0.0.0.0:30917"]
-    container_name: openhands-runtime
-    restart: unless-stopped
-    ports:
-      - "30917:30917"
-      - "47017:47017"
-      - "53309:53309"
-      - "58691:58691"
-    networks:
-      - openhands
+    stdin_open: true
+    tty: true
 
 networks:
-  openhands:
+  default:
     driver: bridge
