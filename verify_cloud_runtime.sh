@@ -73,12 +73,14 @@ else
     echo "   Found $session_count active sessions"
 fi
 
-# Check if nginx configuration is valid
-if nginx -t 2>/dev/null; then
+# Check if nginx configuration is valid (fixed logic)
+echo "Checking nginx configuration..."
+if sudo nginx -t >/dev/null 2>&1; then
     echo "✅ Current nginx configuration is valid"
 else
     echo "❌ Current nginx configuration has errors!"
     echo "Run 'sudo nginx -t' to see detailed error messages"
+    sudo nginx -t
     exit 1
 fi
 
@@ -97,4 +99,4 @@ echo "- VS Code server with proper proxy configuration"
 echo "- Cloud-accessible application URLs"
 echo ""
 echo "To start OpenHands with cloud runtime:"
-echo "source ~/.openhands_env && python -m openhands.core.main"
+echo "source ~/.openhands_env && python3 -m openhands.core.main"

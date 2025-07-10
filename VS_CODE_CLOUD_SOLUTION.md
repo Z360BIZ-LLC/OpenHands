@@ -117,7 +117,7 @@ chmod +x verify_cloud_runtime.sh
 ./verify_cloud_runtime.sh
 
 # Start OpenHands with cloud runtime
-source ~/.openhands_env && python -m openhands.core.main
+source ~/.openhands_env && python3 -m openhands.core.main
 ```
 
 ## Result
